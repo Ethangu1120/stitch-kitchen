@@ -13,8 +13,6 @@ View your app in AI Studio: https://ai.studio/apps/drive/1qFJomGnm5tAF97Am6yjtzP
 **Prerequisites:**  Node.js
 
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The project now ships as a static multi-page site that still uses React via CDN imports (no bundler required). Open `index.html`, `fridge.html`, `shopping.html`, `profile.html`, or `recipe.html?id=1` directly in the browser, or serve the folder with any static server (for example, `npx serve .`).
+
+Legacy Node/Vite files have been removed. If you still see an old `node_modules` directory from the previous setup, you can delete it from Finder or with `rm -rf node_modules` (may require admin rights).

@@ -1,6 +1,4 @@
-import { Recipe, FridgeItem, ShoppingItem } from './types';
-
-export const RECIPES: Recipe[] = [
+export const RECIPES = [
   {
     id: '1',
     title: '西红柿炒鸡蛋',
@@ -99,10 +97,10 @@ export const RECIPES: Recipe[] = [
       { id: 3, instruction: '加入西红柿煮出汁，然后加入煮熟的意大利面搅拌均匀。' }
     ]
   },
-   {
+  {
     id: '6',
     title: '可乐鸡翅',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAogHMQr5pRt-iJBeulWAmZqfxD5kRb-kzkc2SCJIxneX59nWIw9hKeiKb6jOKVw9Dz4sQfvZYlKN7vmnoFR0xhWC7SCFHxENwW5bQe3pPgb3Nu2yG37mzSc3rgx4OasIfOY4fzyrOhudxIpwFwpQhgSjOHhko1HXpTqCx6UdaFOHGZzyV-JU6VnlD-U_fmWEtsJyEhK4NbHx7AT5ChfFU6TxrdQCns50P4nKEEaJq4kHefuJ5g3CJ67D1vUGN5C9lWT2ze7ZX-0dQ',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAogHMQr5pRt-iJBeulWAmZqfxD5kRb-kzkc2SCJIxneX59nWIw9hKeiKb6jOKVw9Dz4sQfvZYlKN7vmnoFR0xhWC7SCFHxENwW5bQe3Pgb3Nu2yG37mzSc3rgx4OasIfOY4fzyrOhudxIpwFwpQhgSjOHhko1HXpTqCx6UdaFOHGZzyV-JU6VnlD-U_fmWEtsJyEhK4NbHx7AT5ChfFU6TxrdQCns50P4nKEEaJq4kHefuJ5g3CJ67D1vUGN5C9lWT2ze7ZX-0dQ',
     tags: ['鸡翅', '可乐'],
     category: 'Dinner',
     prepTime: '10 分钟',
@@ -120,7 +118,7 @@ export const RECIPES: Recipe[] = [
   }
 ];
 
-export const FRIDGE_ITEMS: FridgeItem[] = [
+export const FRIDGE_ITEMS = [
   { id: '1', name: '西红柿', quantity: '约 3 个', category: '蔬菜', image: 'https://img.gs/fhcwfyfhtl/112x112,quality=80/https://lh3.googleusercontent.com/aida-public/AB6AXuAnD3cboXevZvlRlqXrlacHANjj4a29DZVEQeo1qeMPFf_PPULqdtiaWPYvyMpD1gRULdg_MYqWp7KtyPDJqUqxpDaa-GAUtMFRQIx4rxhubNTDA4NEtNVyfJofFDKzMnrm193_2eXt2_cg9kFZJB2wrvOMcr4C6UReANkdBNRpoHtla3fagwJvi3EDPyCmAut5BsFUQlAB2ocLC6Z_JC66QEHuAv9Z880ofFZldD83Ju9InMa72neuzIkqVkuCZBjafHp2y4Mv-tg' },
   { id: '2', name: '生菜', quantity: '约 1 颗', category: '蔬菜', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAn9h6mgCyVYP6EoDyKzOrSU0MDAMG6IAfa9jE8I_kkg5b0uDoJi9pCj02rB3sqcemrMr05cIPQv32UJJZGMIku0O04a2exPrTQITCMK7nkwDBqqs46Ru4sBAsqu2xXTI3GGLHdjK--NaNpyAPdjOGBNAQehaA8UZ5Oxo02S0v6gzyS0vNBaBVVwoqJverabx15gxQrn_OZ6uPok5SyGx6yLDBYeVdmJ_K7L6PTaAEI5fSyvRrGksQlzanxFMgF7uRFPTFrcVZNLfY' },
   { id: '3', name: '苹果', quantity: '约 3 个', category: '水果', image: 'https://img.gs/fhcwfyfhtl/112x112,quality=80/https://lh3.googleusercontent.com/aida-public/AB6AXuAdQyTptFvWZgOaE-vcOPclLuVro_pl5A2Ff432ivDehsWT_LtlodBHMAJEx83NO9i0hRku_bCoYKGrLiOtvHkJANWjRpw3giwI0AJpzP_n_MMB-r2LoDH4Puh0BmogRURVM_dxcztsm7d0ftb57ldSlXQq6duAXV7wkNiJwlZ9i_AqFFYz1G8-68PKEsIpka1cTxqr_FNkez50WUS32F5ziMwEQ8TAXCC1UrMzLixskFm1WhHW3EuQkqM4Y6xmin6uTrBt11NxL8I' },
@@ -128,7 +126,7 @@ export const FRIDGE_ITEMS: FridgeItem[] = [
   { id: '5', name: '鸡胸肉', quantity: '约 1 块', category: '肉类', image: 'https://img.gs/fhcwfyfhtl/112x112,quality=80/https://lh3.googleusercontent.com/aida-public/AB6AXuA1MrHRtr8V1s4ji6EjhfTnuMqDMQzcB7uosj7TgD46gvpjyc8FamWLaD3VIWvopNK1d98l1jFAimKnZwddHRWta0IlcFo_r-QWSmkK7GKWfaIYtXDCipzDEVrthnXsI_DyEAEtOU5GWfRvaI88ygC6NsHogPIra-6nN_rUmOF6OBtGYX06ehcBjTwtyr7EQCvSfxh7GCsGrepBCmDfwjPn1H5BmblGY1l-OBXLK2O9hOn7Gc2p2JWSOBEyO-kIf4iuKm0w9CrT2lI' },
 ];
 
-export const SHOPPING_ITEMS: ShoppingItem[] = [
+export const SHOPPING_ITEMS = [
   { id: '1', name: '豆腐', checked: false, category: '豆制品' },
   { id: '2', name: '豆浆', checked: false, category: '豆制品' },
   { id: '3', name: '西红柿', checked: false, category: '蔬菜' },
