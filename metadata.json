@@ -1,0 +1,5 @@
+{
+  "name": "Stitch Kitchen",
+  "description": "A smart kitchen assistant app for recipe recommendations, fridge inventory management, and shopping lists.",
+  "requestFramePermissions": []
+}
