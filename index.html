@@ -3,59 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stitch Kitchen | 菜谱</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <title>Stitch Kitchen | 重定向</title>
+    <meta http-equiv="refresh" content="0; url=./pages/index.html" />
     <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              app: {
-                bg: '#112217',
-                card: '#193322',
-                accent: '#13ec5b',
-                accentDark: '#3a834e',
-                secondary: '#23482f',
-                textSub: '#92c9a4',
-              }
-            },
-            fontFamily: {
-              sans: ['"Noto Sans SC"', 'Inter', 'sans-serif'],
-            }
-          }
-        }
-      }
-    </script>
-    <style>
-      body {
-        background-color: #112217;
-        color: white;
-      }
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-    </style>
-    <script type="importmap">
-    {
-      "imports": {
-        "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-        "react/": "https://aistudiocdn.com/react@^19.2.0/",
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
-      }
-    }
+      // JS 重定向，确保在部分环境下也能工作
+      window.location.replace('./pages/index.html');
     </script>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="./scripts/home.js"></script>
+  <body style="background-color:#112217;color:white;">
+    <p>正在跳转到首页…… 如果没有自动跳转，请点击
+      <a href="./pages/index.html" style="color:#13ec5b;">这里</a>。</p>
   </body>
 </html>
