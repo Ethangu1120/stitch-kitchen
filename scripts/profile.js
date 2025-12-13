@@ -80,13 +80,7 @@ const AuthSection = ({ onLoggedIn }) => {
   );
 };
 
-const ProfileContent = ({ user, onLogout }) => {
-  const [avatarPreview, setAvatarPreview] = useState(resolveAvatarUrl(user?.avatar_url) || '');
-  const fileRef = useRef(null);
-  const oldPwdRef = useRef(null);
-  const newPwdRef = useRef(null);
-  const [msg, setMsg] = useState('');
-  const [tab, setTab] = useState('my'); // 'my' | 'settings'
+const ProfileContent = ({ user, onLogout, avatarPreview }) => {
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
@@ -99,85 +93,12 @@ const ProfileContent = ({ user, onLogout }) => {
     }
   }, []);
 
-  const uploadAvatar = async () => {
-    const file = fileRef.current?.files?.[0];
-    setMsg('');
-    if (!file) {
-      setMsg('请选择图片文件');
-      return;
-    }
-    const token = localStorage.getItem('token');
-    const form = new FormData();
-    form.append('avatar', file);
-    try {
-      const res = await fetch(`${API_BASE}/users/avatar`, {
-        method: 'POST',
-        headers: getAuthHeaders(token),
-        body: form
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.detail || '上传失败');
-      setAvatarPreview(resolveAvatarUrl(data.avatar_url));
-      setMsg('头像已更新');
-    } catch (e) {
-      setMsg(e.message);
-    }
-  };
-
-  const changePassword = async () => {
-    const old_password = oldPwdRef.current?.value || '';
-    const new_password = newPwdRef.current?.value || '';
-    setMsg('');
-    if (!old_password || !new_password) {
-      setMsg('请输入旧密码和新密码');
-      return;
-    }
-    const token = localStorage.getItem('token');
-    try {
-      const res = await fetch(`${API_BASE}/users/password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders(token) },
-        body: JSON.stringify({ old_password, new_password })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.detail || '修改失败');
-      setMsg('密码已修改');
-      oldPwdRef.current.value = '';
-      newPwdRef.current.value = '';
-    } catch (e) {
-      setMsg(e.message);
-    }
-  };
-
   return h(
     'div',
     { className: 'flex flex-col gap-4' },
 
-    // Tabs
-    h(
-      'div',
-      { className: 'flex gap-2 px-4' },
-      h(
-        'button',
-        {
-          onClick: () => setTab('my'),
-          className: `rounded-lg h-8 px-4 font-medium ${tab === 'my' ? 'bg-app-accent text-black' : 'bg-app-bg text-white'}`
-        },
-        '我的'
-      ),
-      h(
-        'button',
-        {
-          onClick: () => setTab('settings'),
-          className: `rounded-lg h-8 px-4 font-medium ${tab === 'settings' ? 'bg-app-accent text-black' : 'bg-app-bg text-white'}`
-        },
-        '设置'
-      )
-    ),
-
     // MY TAB
-    tab === 'my'
-      ? h(
+    h(
           React.Fragment,
           null,
           h(
@@ -231,47 +152,17 @@ const ProfileContent = ({ user, onLogout }) => {
             )
           )
         )
-      : null,
-
-    // SETTINGS TAB
-    tab === 'settings'
-      ? h(
-          React.Fragment,
-          null,
-          h(
-            'div',
-            { className: 'flex flex-col gap-2 rounded-xl bg-app-card p-4' },
-            h('h3', { className: 'text-white text-lg font-bold leading-tight' }, '上传头像'),
-            h('input', { type: 'file', accept: 'image/*', ref: fileRef, className: 'rounded-lg bg-app-bg px-3 py-2 text-white' }),
-            h(
-              'button',
-              { onClick: uploadAvatar, className: 'flex items-center justify-center gap-2 rounded-lg h-10 bg-app-accent text-black font-semibold' },
-              h(Upload, { size: 18 }),
-              '上传'
-            )
-          ),
-
-          h(
-            'div',
-            { className: 'flex flex-col gap-2 rounded-xl bg-app-card p-4' },
-            h('h3', { className: 'text-white text-lg font-bold leading-tight' }, '修改密码'),
-            h('input', { type: 'password', placeholder: '旧密码', ref: oldPwdRef, className: 'rounded-lg bg-app-bg px-3 py-2 text-white' }),
-            h('input', { type: 'password', placeholder: '新密码', ref: newPwdRef, className: 'rounded-lg bg-app-bg px-3 py-2 text-white' }),
-            h(
-              'button',
-              { onClick: changePassword, className: 'flex items-center justify-center rounded-lg h-10 bg-app-accent text-black font-semibold' },
-              '保存'
-            )
-          ),
-
-          msg ? h('p', { className: 'text-green-400 text-sm px-4' }, msg) : null
-        )
-      : null
   );
 };
 
 const ProfileScreen = () => {
   const [user, setUser] = useState(null);
+  const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState('');
+  const fileRef = useRef(null);
+  const oldPwdRef = useRef(null);
+  const newPwdRef = useRef(null);
+  const [msg, setMsg] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -279,10 +170,63 @@ const ProfileScreen = () => {
     fetch(`${API_BASE}/users/me`, { headers: getAuthHeaders(token) })
       .then(async (res) => {
         const data = await res.json();
-        if (res.ok) setUser({ username: data.username, avatar_url: resolveAvatarUrl(data.avatar_url) });
+        if (res.ok) {
+          setUser({ username: data.username, avatar_url: resolveAvatarUrl(data.avatar_url) });
+          setAvatarPreview(resolveAvatarUrl(data.avatar_url) || '');
+        }
       })
       .catch(() => {});
-  }, []);
+  }, [user]); // Add user to dependency array
+
+  const uploadAvatar = async () => {
+    const file = fileRef.current?.files?.[0];
+    setMsg('');
+    if (!file) {
+      setMsg('请选择图片文件');
+      return;
+    }
+    const token = localStorage.getItem('token');
+    const form = new FormData();
+    form.append('avatar', file);
+    try {
+      const res = await fetch(`${API_BASE}/users/avatar`, {
+        method: 'POST',
+        headers: getAuthHeaders(token),
+        body: form
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.detail || '上传失败');
+      setAvatarPreview(resolveAvatarUrl(data.avatar_url));
+      setMsg('头像已更新');
+    } catch (e) {
+      setMsg(e.message);
+    }
+  };
+
+  const changePassword = async () => {
+    const old_password = oldPwdRef.current?.value || '';
+    const new_password = newPwdRef.current?.value || '';
+    setMsg('');
+    if (!old_password || !new_password) {
+      setMsg('请输入旧密码和新密码');
+      return;
+    }
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API_BASE}/users/password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders(token) },
+        body: JSON.stringify({ old_password, new_password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.detail || '修改失败');
+      setMsg('密码已修改');
+      oldPwdRef.current.value = '';
+      newPwdRef.current.value = '';
+    } catch (e) {
+      setMsg(e.message);
+    }
+  };
 
   return h(
     Page,
@@ -290,12 +234,45 @@ const ProfileScreen = () => {
     h(PageHeader, {
       title: '我的',
       rightSlot: h(
-        'button',
-        { className: 'flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-transparent text-white' },
-        h(Settings, { size: 24 })
+        'div',
+        { className: 'relative' },
+        h(
+          'button',
+          { onClick: () => setShowSettingsDropdown(!showSettingsDropdown), className: 'flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-transparent text-white' },
+          h(Settings, { size: 24 })
+        )
       )
     }),
-    h('div', { className: 'p-4' }, user ? h(ProfileContent, { user, onLogout: () => { localStorage.removeItem('token'); setUser(null); } }) : h(AuthSection, { onLoggedIn: setUser }))
+    showSettingsDropdown &&
+      h(
+        'div',
+        { className: 'absolute right-4 top-16 w-64 bg-app-card rounded-md shadow-lg z-10 p-4 flex flex-col gap-4' },
+        h(
+          'div',
+          { className: 'flex flex-col gap-2' },
+          h('label', { className: 'text-white text-lg font-bold' }, '修改头像'),
+          h('input', { type: 'file', ref: fileRef, className: 'text-app-textSub text-sm', accept: 'image/*' }),
+          h(
+            'button',
+            { onClick: uploadAvatar, className: 'bg-app-blue text-white py-2 px-4 rounded-md' },
+            '上传头像'
+          )
+        ),
+        h(
+          'div',
+          { className: 'flex flex-col gap-2' },
+          h('label', { className: 'text-white text-lg font-bold' }, '修改密码'),
+          h('input', { type: 'password', ref: oldPwdRef, className: 'p-2 rounded-md bg-app-bg text-white', placeholder: '旧密码' }),
+          h('input', { type: 'password', ref: newPwdRef, className: 'p-2 rounded-md bg-app-bg text-white', placeholder: '新密码' }),
+          h(
+            'button',
+            { onClick: changePassword, className: 'bg-app-blue text-white py-2 px-4 rounded-md' },
+            '修改密码'
+          )
+        ),
+        msg && h('p', { className: 'text-app-red text-sm' }, msg)
+      ),
+    h('div', { className: 'p-4' }, user ? h(ProfileContent, { user, onLogout: () => { localStorage.removeItem('token'); setUser(null); }, avatarPreview }) : h(AuthSection, { onLoggedIn: setUser }))
   );
 };
 
