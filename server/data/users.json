@@ -4,6 +4,11 @@
       "username": "Ethangu1120",
       "password_hash": "$2b$12$IldnlYOV71FNgTIjgwvSA.QvHzPBwhBK32RFB2qc8g9qoW/SErl3G",
       "avatar_filename": "Ethangu1120.jpg"
+    },
+    {
+      "username": "Ethangu",
+      "password_hash": "$2b$12$iZPg.CUlY3nn8Rw.rxvHLO/0jmGvCqzDH4v5JOkiy3hrnDNVlwAuu",
+      "avatar_filename": "Ethangu.png"
     }
   ]
 }

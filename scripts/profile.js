@@ -86,6 +86,18 @@ const ProfileContent = ({ user, onLogout }) => {
   const oldPwdRef = useRef(null);
   const newPwdRef = useRef(null);
   const [msg, setMsg] = useState('');
+  const [tab, setTab] = useState('my'); // 'my' | 'settings'
+  const [favorites, setFavorites] = useState([]);
+
+  useEffect(() => {
+    try {
+      const ids = JSON.parse(localStorage.getItem('favorites') || '[]');
+      const favs = RECIPES.filter((r) => ids.includes(r.id));
+      setFavorites(favs);
+    } catch {
+      setFavorites([]);
+    }
+  }, []);
 
   const uploadAvatar = async () => {
     const file = fileRef.current?.files?.[0];
@@ -140,52 +152,121 @@ const ProfileContent = ({ user, onLogout }) => {
   return h(
     'div',
     { className: 'flex flex-col gap-4' },
-    h(
-      'div',
-      { className: 'flex items-center gap-4 rounded-xl bg-app-card p-4' },
-      avatarPreview
-        ? h('img', { src: avatarPreview, alt: 'avatar', className: 'h-20 w-20 rounded-full object-cover bg-gray-700' })
-        : h(UserCircle, { size: 80, className: 'text-app-textSub' }),
-      h('div', { className: 'flex-1' }, h('p', { className: 'text-white text-[22px] font-bold leading-tight' }, user.username))
-    ),
 
+    // Tabs
     h(
       'div',
-      { className: 'flex flex-col gap-2 rounded-xl bg-app-card p-4' },
-      h('h3', { className: 'text-white text-lg font-bold leading-tight' }, '上传头像'),
-      h('input', { type: 'file', accept: 'image/*', ref: fileRef, className: 'rounded-lg bg-app-bg px-3 py-2 text-white' }),
+      { className: 'flex gap-2 px-4' },
       h(
         'button',
-        { onClick: uploadAvatar, className: 'flex items-center justify-center gap-2 rounded-lg h-10 bg-app-accent text-black font-semibold' },
-        h(Upload, { size: 18 }),
-        '上传'
+        {
+          onClick: () => setTab('my'),
+          className: `rounded-lg h-8 px-4 font-medium ${tab === 'my' ? 'bg-app-accent text-black' : 'bg-app-bg text-white'}`
+        },
+        '我的'
+      ),
+      h(
+        'button',
+        {
+          onClick: () => setTab('settings'),
+          className: `rounded-lg h-8 px-4 font-medium ${tab === 'settings' ? 'bg-app-accent text-black' : 'bg-app-bg text-white'}`
+        },
+        '设置'
       )
     ),
 
-    h(
-      'div',
-      { className: 'flex flex-col gap-2 rounded-xl bg-app-card p-4' },
-      h('h3', { className: 'text-white text-lg font-bold leading-tight' }, '修改密码'),
-      h('input', { type: 'password', placeholder: '旧密码', ref: oldPwdRef, className: 'rounded-lg bg-app-bg px-3 py-2 text-white' }),
-      h('input', { type: 'password', placeholder: '新密码', ref: newPwdRef, className: 'rounded-lg bg-app-bg px-3 py-2 text-white' }),
-      h(
-        'button',
-        { onClick: changePassword, className: 'flex items-center justify-center rounded-lg h-10 bg-app-accent text-black font-semibold' },
-        '保存'
-      )
-    ),
+    // MY TAB
+    tab === 'my'
+      ? h(
+          React.Fragment,
+          null,
+          h(
+            'div',
+            { className: 'flex items-center gap-4 rounded-xl bg-app-card p-4' },
+            avatarPreview
+              ? h('img', { src: avatarPreview, alt: 'avatar', className: 'h-20 w-20 rounded-full object-cover bg-gray-700' })
+              : h(UserCircle, { size: 80, className: 'text-app-textSub' }),
+            h('div', { className: 'flex-1' }, h('p', { className: 'text-white text-[22px] font-bold leading-tight' }, user.username))
+          ),
 
-    msg ? h('p', { className: 'text-green-400 text-sm px-4' }, msg) : null,
+          h(
+            'div',
+            { className: 'flex flex-col gap-2 rounded-xl bg-app-card p-4' },
+            h('h3', { className: 'text-white text-lg font-bold leading-tight' }, '收藏的菜'),
+            favorites.length === 0
+              ? h('p', { className: 'text-app-textSub text-sm' }, '暂无收藏，去菜谱页面看看吧。')
+              : h(
+                  'div',
+                  { className: 'space-y-2' },
+                  favorites.map((f) =>
+                    h(
+                      'a',
+                      {
+                        key: f.id,
+                        href: `./recipe.html?id=${f.id}`,
+                        className: 'flex items-start justify-between gap-4 cursor-pointer text-left w-full'
+                      },
+                      h(
+                        'div',
+                        { className: 'flex flex-col gap-1 flex-1' },
+                        h('p', { className: 'text-white text-base font-medium leading-tight' }, f.title),
+                        h('p', { className: 'text-app-textSub text-sm font-normal leading-normal truncate' }, f.tags.join(', '))
+                      ),
+                      h('div', {
+                        className: 'w-20 h-20 bg-center bg-no-repeat bg-cover rounded-lg shrink-0 bg-gray-700',
+                        style: { backgroundImage: `url("${f.image}")` }
+                      })
+                    )
+                  )
+                )
+          ),
 
-    h(
-      'div',
-      { className: 'flex justify-end px-4' },
-      h(
-        'button',
-        { onClick: onLogout, className: 'text-app-textSub underline' },
-        '退出登录'
-      )
-    )
+          h(
+            'div',
+            { className: 'flex justify-end px-4' },
+            h(
+              'button',
+              { onClick: onLogout, className: 'text-app-textSub underline' },
+              '退出登录'
+            )
+          )
+        )
+      : null,
+
+    // SETTINGS TAB
+    tab === 'settings'
+      ? h(
+          React.Fragment,
+          null,
+          h(
+            'div',
+            { className: 'flex flex-col gap-2 rounded-xl bg-app-card p-4' },
+            h('h3', { className: 'text-white text-lg font-bold leading-tight' }, '上传头像'),
+            h('input', { type: 'file', accept: 'image/*', ref: fileRef, className: 'rounded-lg bg-app-bg px-3 py-2 text-white' }),
+            h(
+              'button',
+              { onClick: uploadAvatar, className: 'flex items-center justify-center gap-2 rounded-lg h-10 bg-app-accent text-black font-semibold' },
+              h(Upload, { size: 18 }),
+              '上传'
+            )
+          ),
+
+          h(
+            'div',
+            { className: 'flex flex-col gap-2 rounded-xl bg-app-card p-4' },
+            h('h3', { className: 'text-white text-lg font-bold leading-tight' }, '修改密码'),
+            h('input', { type: 'password', placeholder: '旧密码', ref: oldPwdRef, className: 'rounded-lg bg-app-bg px-3 py-2 text-white' }),
+            h('input', { type: 'password', placeholder: '新密码', ref: newPwdRef, className: 'rounded-lg bg-app-bg px-3 py-2 text-white' }),
+            h(
+              'button',
+              { onClick: changePassword, className: 'flex items-center justify-center rounded-lg h-10 bg-app-accent text-black font-semibold' },
+              '保存'
+            )
+          ),
+
+          msg ? h('p', { className: 'text-green-400 text-sm px-4' }, msg) : null
+        )
+      : null
   );
 };
 
