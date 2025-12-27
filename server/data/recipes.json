@@ -1,0 +1,26 @@
+[
+  {
+    "name": "西红柿炒鸡蛋",
+    "description": "一道经典且简单的家常菜，酸甜适口，营养丰富。",
+    "type": "中饭",
+    "time": {
+      "prep": 5,
+      "cook": 10
+    },
+    "ingredients": [
+      { "name": "西红柿", "amount": 300, "isEnough": true },
+      { "name": "鸡蛋", "amount": 150, "isEnough": true },
+      { "name": "小葱", "amount": 10, "isEnough": false },
+      { "name": "白糖", "amount": 5, "isEnough": true },
+      { "name": "盐", "amount": 2, "isEnough": true },
+      { "name": "食用油", "amount": 20, "isEnough": true }
+    ],
+    "steps": [
+      "西红柿洗净切成块，鸡蛋打入碗中搅匀，小葱切碎。",
+      "锅中倒入适量油，油热后倒入蛋液，炒熟后盛出备用。",
+      "锅中留少许底油，放入葱花爆香，倒入西红柿块翻炒至出汁。",
+      "加入一勺白糖和适量盐调味。",
+      "倒入之前炒好的鸡蛋，快速翻炒均匀即可出锅。"
+    ]
+  }
+]
