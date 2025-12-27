@@ -1,0 +1,34 @@
+[
+  {
+    "name": "西红柿",
+    "amount": 1000
+  },
+  {
+    "name": "鸡蛋",
+    "amount": 500
+  },
+  {
+    "name": "五花肉",
+    "amount": 800
+  },
+  {
+    "name": "青椒",
+    "amount": 300
+  },
+  {
+    "name": "鸡胸肉",
+    "amount": 600
+  },
+  {
+    "name": "小葱",
+    "amount": 50
+  },
+  {
+    "name": "生姜",
+    "amount": 30
+  },
+  {
+    "name": "大蒜",
+    "amount": 40
+  }
+]

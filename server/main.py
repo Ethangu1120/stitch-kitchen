@@ -1,19 +1,27 @@
 import os
 import json
 import uuid
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from fastapi import FastAPI, HTTPException, UploadFile, File, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from fastapi.responses import Response
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
+RECIPES_FILE = os.path.join(DATA_DIR, "recipes.json")
+INGREDIENTS_FILE = os.path.join(DATA_DIR, "ingredients.json")
 AVATAR_DIR = os.path.join(BASE_DIR, "avatars")
 API_BASE = "/api"
+
+# client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(AVATAR_DIR, exist_ok=True)
@@ -26,7 +34,15 @@ sessions: Dict[str, str] = {}  # token -> username
 
 app = FastAPI(title="Stitch Kitchen API")
 
-# CORS
+def get_openai_client():
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set in .env file")
+    # Force unset proxy env vars if they cause issues with httpx
+    # os.environ.pop("HTTP_PROXY", None)
+    # os.environ.pop("HTTPS_PROXY", None)
+    # os.environ.pop("ALL_PROXY", None)
+    return OpenAI(api_key=api_key)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:8000"],
@@ -176,3 +192,59 @@ def vite_client_stub_encoded():
 @app.get("/__vite_ping")
 def vite_ping_stub():
     return {"status": "ok"}
+
+
+@app.post(f"{API_BASE}/recipes/generate")
+def generate_recipe(authorization: Optional[str] = Header(None)):
+    username = require_token(authorization)
+    
+    if not os.path.exists(INGREDIENTS_FILE):
+        raise HTTPException(status_code=404, detail="Ingredients file not found")
+        
+    with open(INGREDIENTS_FILE, "r", encoding="utf-8") as f:
+        ingredients_data = json.load(f)
+    
+    # Format ingredients for the prompt
+    ingredients_list = [f"{item['name']}: {item['amount']}g" for item in ingredients_data]
+    ingredients_str = ", ".join(ingredients_list)
+    
+    prompt = f"""
+    你是一个专业的厨师。请根据以下现有的食材清单，为用户推荐一道美味的菜谱。
+    食材清单: {ingredients_str}
+    
+    输出必须是严格的 JSON 格式，包含以下字段：
+    - name: 菜名
+    - description: 简单介绍
+    - type: 餐次（早饭/中饭/晚饭）
+    - time: 一个对象，包含 prep (准备时间，分钟) 和 cook (烹饪时间，分钟)
+    - ingredients: 一个数组，每个对象包含 name (食材名), amount (建议使用的重量，数字，单位g), isEnough (布尔值，根据现有食材判断是否足够，通常设为 true)
+    - steps: 详细步骤数组
+    
+    请只返回 JSON 对象，不要有任何其他文字。
+    """
+    
+    try:
+        client = get_openai_client()
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo", # 或者使用 "gpt-4"
+            messages=[{"role": "user", "content": prompt}],
+            response_format={ "type": "json_object" }
+        )
+        
+        recipe_content = json.loads(response.choices[0].message.content)
+        
+        # Save to recipes.json
+        recipes = []
+        if os.path.exists(RECIPES_FILE):
+            with open(RECIPES_FILE, "r", encoding="utf-8") as f:
+                recipes = json.load(f)
+        
+        recipes.append(recipe_content)
+        
+        with open(RECIPES_FILE, "w", encoding="utf-8") as f:
+            json.dump(recipes, f, ensure_ascii=False, indent=2)
+            
+        return recipe_content
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
