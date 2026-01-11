@@ -8,8 +8,9 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from fastapi.responses import Response
-from openai import OpenAI
 from dotenv import load_dotenv
+
+from ai_utils import generate_recipe_with_ai, identify_ingredients_from_image
 
 load_dotenv()
 
@@ -34,15 +35,6 @@ sessions: Dict[str, str] = {}  # token -> username
 
 app = FastAPI(title="Stitch Kitchen API")
 
-def get_openai_client():
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set in .env file")
-    # Force unset proxy env vars if they cause issues with httpx
-    # os.environ.pop("HTTP_PROXY", None)
-    # os.environ.pop("HTTPS_PROXY", None)
-    # os.environ.pop("ALL_PROXY", None)
-    return OpenAI(api_key=api_key)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:8000"],
@@ -194,6 +186,55 @@ def vite_ping_stub():
     return {"status": "ok"}
 
 
+@app.get(f"{API_BASE}/ingredients")
+def get_ingredients(authorization: Optional[str] = Header(None)):
+    username = require_token(authorization)
+    if not os.path.exists(INGREDIENTS_FILE):
+        return []
+    with open(INGREDIENTS_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@app.post(f"{API_BASE}/fridge/identify")
+async def identify_fridge_ingredients(
+    authorization: Optional[str] = Header(None), 
+    file: UploadFile = File(...)
+):
+    username = require_token(authorization)
+    print(f"[DEBUG] User {username} is uploading an image for identification...")
+    
+    # 读取图片内容
+    image_bytes = await file.read()
+    print(f"[DEBUG] Received image size: {len(image_bytes)} bytes")
+    
+    try:
+        # 调用 AI 识别
+        print(f"[DEBUG] Calling AI vision...")
+        new_ingredients = identify_ingredients_from_image(image_bytes)
+        print(f"[DEBUG] AI identified ingredients: {new_ingredients}")
+        
+        if not new_ingredients:
+            print(f"[DEBUG] AI returned no ingredients.")
+            raise HTTPException(status_code=400, detail="未识别到菜品，上传失败")
+        
+        # 直接使用 AI 识别出的新食材覆盖旧数据
+        # 保存更新后的 JSON
+        with open(INGREDIENTS_FILE, "w", encoding="utf-8") as f:
+            json.dump(new_ingredients, f, ensure_ascii=False, indent=2)
+        
+        print(f"[DEBUG] Successfully overwrote ingredients.json with new identification results")
+        return {"message": "识别成功，已更新冰箱清单", "added": new_ingredients}
+        
+    except HTTPException as he:
+        print(f"[DEBUG] HTTPException: {he.detail}")
+        raise he
+    except Exception as e:
+        print(f"[DEBUG] Internal Server Error during identification: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"识别失败: {str(e)}")
+
+
 @app.post(f"{API_BASE}/recipes/generate")
 def generate_recipe(authorization: Optional[str] = Header(None)):
     username = require_token(authorization)
@@ -204,34 +245,8 @@ def generate_recipe(authorization: Optional[str] = Header(None)):
     with open(INGREDIENTS_FILE, "r", encoding="utf-8") as f:
         ingredients_data = json.load(f)
     
-    # Format ingredients for the prompt
-    ingredients_list = [f"{item['name']}: {item['amount']}g" for item in ingredients_data]
-    ingredients_str = ", ".join(ingredients_list)
-    
-    prompt = f"""
-    你是一个专业的厨师。请根据以下现有的食材清单，为用户推荐一道美味的菜谱。
-    食材清单: {ingredients_str}
-    
-    输出必须是严格的 JSON 格式，包含以下字段：
-    - name: 菜名
-    - description: 简单介绍
-    - type: 餐次（早饭/中饭/晚饭）
-    - time: 一个对象，包含 prep (准备时间，分钟) 和 cook (烹饪时间，分钟)
-    - ingredients: 一个数组，每个对象包含 name (食材名), amount (建议使用的重量，数字，单位g), isEnough (布尔值，根据现有食材判断是否足够，通常设为 true)
-    - steps: 详细步骤数组
-    
-    请只返回 JSON 对象，不要有任何其他文字。
-    """
-    
     try:
-        client = get_openai_client()
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo", # 或者使用 "gpt-4"
-            messages=[{"role": "user", "content": prompt}],
-            response_format={ "type": "json_object" }
-        )
-        
-        recipe_content = json.loads(response.choices[0].message.content)
+        recipe_content = generate_recipe_with_ai(ingredients_data)
         
         # Save to recipes.json
         recipes = []

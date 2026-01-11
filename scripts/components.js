@@ -54,11 +54,10 @@ export function BottomNav({ current }) {
             { className: `flex h-8 items-center justify-center ${isActive ? 'bg-transparent rounded-full' : ''}` },
             h(Icon, {
               size: 24,
-              weight: isActive ? 'fill' : 'regular',
               fill: isActive ? 'currentColor' : 'none',
-              stroke: isActive ? 'none' : 'currentColor',
-              strokeWidth: isActive ? 0 : 2,
-              className: isActive ? 'fill-current' : ''
+              stroke: 'currentColor',
+              strokeWidth: isActive ? 2 : 2,
+              className: isActive ? 'text-white' : 'text-app-textSub'
             })
           ),
           h('p', { className: 'text-xs font-medium leading-normal tracking-[0.015em]' }, label)
