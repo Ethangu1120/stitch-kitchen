@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from fastapi.responses import Response
 from dotenv import load_dotenv
 
-from ai_utils import generate_recipe_with_ai, identify_ingredients_from_image
+from ai_utils import generate_recipe_with_ai, identify_ingredients_from_image, update_data_with_ai, regenerate_all_data_with_ai
 
 load_dotenv()
 
@@ -224,7 +224,30 @@ async def identify_fridge_ingredients(
             json.dump(new_ingredients, f, ensure_ascii=False, indent=2)
         
         print(f"[DEBUG] Successfully overwrote ingredients.json with new identification results")
-        return {"message": "识别成功，已更新冰箱清单", "added": new_ingredients}
+
+        # --- 调用 AI 全量重新生成菜谱和购物单 ---
+        print(f"[DEBUG] Starting AI full regeneration for recipes and shopping list...")
+        
+        # 调用 AI 全量生成
+        updated_recipes, updated_shopping = regenerate_all_data_with_ai(new_ingredients)
+        
+        # 保存更新后的数据
+        if updated_recipes:
+            with open(RECIPES_FILE, "w", encoding="utf-8") as f:
+                json.dump(updated_recipes, f, ensure_ascii=False, indent=2)
+            print(f"[DEBUG] Regenerated recipes.json with {len(updated_recipes)} recipes")
+            
+        if updated_shopping:
+            with open(SHOPPING_FILE, "w", encoding="utf-8") as f:
+                json.dump(updated_shopping, f, ensure_ascii=False, indent=2)
+            print(f"[DEBUG] Regenerated shopping.json with {len(updated_shopping)} items")
+
+        return {
+            "message": "识别成功，冰箱清单、菜谱及购物单已同步更新", 
+            "added": new_ingredients,
+            "recipes_count": len(updated_recipes),
+            "shopping_count": len(updated_shopping)
+        }
         
     except HTTPException as he:
         print(f"[DEBUG] HTTPException: {he.detail}")

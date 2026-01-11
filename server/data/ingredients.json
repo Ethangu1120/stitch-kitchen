@@ -1,47 +1,47 @@
 [
   {
     "name": "生菜",
-    "amount": 150,
+    "amount": 100,
     "category": "蔬菜"
   },
   {
-    "name": "樱桃番茄",
+    "name": "小番茄",
     "amount": 50,
     "category": "蔬菜"
   },
   {
-    "name": "黄甜椒",
-    "amount": 30,
+    "name": "甜椒丝",
+    "amount": 50,
     "category": "蔬菜"
   },
   {
-    "name": "蘑菇",
-    "amount": 300,
-    "category": "蔬菜"
-  },
-  {
-    "name": "樱桃番茄",
-    "amount": 150,
+    "name": "口蘑",
+    "amount": 200,
     "category": "蔬菜"
   },
   {
     "name": "红甜椒",
-    "amount": 200,
+    "amount": 150,
+    "category": "蔬菜"
+  },
+  {
+    "name": "串状小番茄",
+    "amount": 100,
     "category": "蔬菜"
   },
   {
     "name": "西兰花",
-    "amount": 200,
+    "amount": 150,
     "category": "蔬菜"
   },
   {
     "name": "三文鱼",
-    "amount": 250,
+    "amount": 200,
     "category": "海鲜/河鲜"
   },
   {
     "name": "鸡胸肉",
-    "amount": 250,
+    "amount": 200,
     "category": "肉类"
   },
   {
@@ -50,13 +50,13 @@
     "category": "蔬菜"
   },
   {
-    "name": "樱桃番茄",
-    "amount": 100,
+    "name": "小番茄",
+    "amount": 50,
     "category": "蔬菜"
   },
   {
     "name": "生菜",
-    "amount": 150,
+    "amount": 100,
     "category": "蔬菜"
   },
   {

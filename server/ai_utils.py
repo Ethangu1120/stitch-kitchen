@@ -113,9 +113,8 @@ def generate_recipe_with_ai(ingredients_data: list):
     
     try:
         response = client.chat.completions.create(
-            model="deepseek-v3.2", # 或者使用 "gpt-4"
-            messages=[{"role": "user", "content": prompt}],
-            response_format={ "type": "json_object" }
+            model="ernie-speed-128k",
+            messages=[{"role": "user", "content": prompt}]
         )
         
         raw_content = response.choices[0].message.content
@@ -124,10 +123,145 @@ def generate_recipe_with_ai(ingredients_data: list):
         if not raw_content:
             raise Exception("AI returned an empty response.")
             
-        return json.loads(raw_content)
-    except json.JSONDecodeError as e:
-        print(f"DEBUG: JSON decode error. Content that failed to parse:\n{raw_content}")
-        raise Exception(f"Failed to parse AI response as JSON: {str(e)}")
+        try:
+            return json.loads(raw_content)
+        except json.JSONDecodeError:
+            if "```json" in raw_content:
+                content = raw_content.split("```json")[1].split("```")[0].strip()
+                return json.loads(content)
+            elif "```" in raw_content:
+                content = raw_content.split("```")[1].split("```")[0].strip()
+                return json.loads(content)
+            else:
+                raise
     except Exception as e:
         print(f"DEBUG: Unexpected error during AI call: {type(e).__name__}: {str(e)}")
+        raise e
+
+def update_data_with_ai(ingredients_data: list, current_recipes: list, current_shopping_list: list):
+    """
+    使用 AI 更新菜谱和购物单。
+    1. 根据现有食材更新菜谱中 ingredients 的 isEnough 状态。
+    2. 推荐一个可以使用现有食材制作的新菜谱。
+    3. 更新购物清单：移除冰箱已有食材，添加菜谱缺失食材。
+    """
+    client = get_openai_client()
+    if not client:
+        raise Exception("AI Client not configured.")
+
+    prompt = f"""
+    你是一个智能厨房助手。请根据最新的冰箱食材清单，更新现有的菜谱库和购物单。
+
+    1. 冰箱食材清单: {json.dumps(ingredients_data, ensure_ascii=False)}
+    2. 现有菜谱库: {json.dumps(current_recipes, ensure_ascii=False)}
+    3. 现有购物单: {json.dumps(current_shopping_list, ensure_ascii=False)}
+
+    任务要求：
+    1. 更新现有菜谱库中每个菜谱的 ingredients 列表。如果冰箱中有该食材且数量充足（或大致足够），将 isEnough 设为 true，否则设为 false。
+    2. 基于冰箱里的现有食材，推荐 1 个新的美味菜谱，并加入到菜谱库中。
+    3. 更新购物单：
+       - 如果购物单中的物品已经在冰箱里了（出现在冰箱食材清单中），请从购物单中移除。
+       - 如果现有菜谱库（包括新推荐的）中有食材的 isEnough 为 false，请将其加入购物单（如果不在清单中）。
+       - 购物单项格式：{{"id": "唯一ID", "name": "名称", "checked": false, "category": "分类"}}。
+
+    输出必须是严格的 JSON 格式，包含两个字段：
+    - updated_recipes: 更新后的完整菜谱数组（包含原有的和新增的一个）。
+    - updated_shopping_list: 更新后的完整购物单数组。
+
+    请只返回 JSON 对象，不要有任何其他文字。
+    """
+
+    try:
+        print(f"[DEBUG] Sending update request to AI...")
+        response = client.chat.completions.create(
+            model="ernie-speed-128k",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        raw_content = response.choices[0].message.content
+        print(f"[DEBUG] AI Update Response: {raw_content}")
+        
+        try:
+            result = json.loads(raw_content)
+        except json.JSONDecodeError:
+            if "```json" in raw_content:
+                content = raw_content.split("```json")[1].split("```")[0].strip()
+                result = json.loads(content)
+            elif "```" in raw_content:
+                content = raw_content.split("```")[1].split("```")[0].strip()
+                result = json.loads(content)
+            else:
+                raise
+
+        return result.get("updated_recipes", []), result.get("updated_shopping_list", [])
+    except Exception as e:
+        print(f"[DEBUG] AI Update Error: {str(e)}")
+        raise e
+
+def regenerate_all_data_with_ai(ingredients_data: list):
+    """
+    根据冰箱食材，使用文心一言模型重新生成完整的 recipes.json 和 shopping.json。
+    尽可能使用 ingredients.json 中的食材。
+    """
+    client = get_openai_client()
+    if not client:
+        raise Exception("AI Client not configured.")
+
+    prompt = f"""
+    你是一个智能厨房管家。请根据当前冰箱里的食材清单，为用户重新规划一份完整的菜谱库和购物清单。
+    
+    冰箱现有食材: {json.dumps(ingredients_data, ensure_ascii=False)}
+
+    任务要求：
+    1. 生成 5-8 道菜谱。
+    2. **关键要求**：这些菜谱应尽可能多地利用冰箱里的现有食材。
+    3. 每个菜谱包含：
+       - name: 菜名
+       - description: 简介
+       - type: 早餐/中饭/晚饭
+       - time: {{ "prep": 准备分钟, "cook": 烹饪分钟 }}
+       - ingredients: 数组，包含 {{ "name": 名称, "amount": 数量(g/个), "isEnough": 布尔值 }}
+         - 如果该食材在“冰箱现有食材”中且数量大致充足，isEnough 设为 true。
+         - 否则设为 false。
+       - steps: 详细步骤数组。
+    4. 生成一份购物清单：
+       - 包含上述所有菜谱中 isEnough 为 false 的食材。
+       - 格式：{{ "id": "唯一字符串ID", "name": "名称", "checked": false, "category": "分类" }}。
+
+    输出必须是严格的 JSON 格式，包含两个字段：
+    - recipes: 菜谱数组
+    - shopping_list: 购物清单数组
+
+    请只返回 JSON 对象，不要有任何其他文字。
+    """
+
+    try:
+        print(f"[DEBUG] Requesting full data regeneration from ERNIE...")
+        response = client.chat.completions.create(
+            model="ernie-speed-128k",
+            messages=[{"role": "user", "content": prompt}]
+            # response_format={ "type": "json_object" } # Some Qianfan models don't support this yet
+        )
+        
+        raw_content = response.choices[0].message.content
+        print(f"[DEBUG] ERNIE Regeneration Response received, length: {len(raw_content)}")
+        # print(f"[DEBUG] Raw content: {raw_content}") # Uncomment if needed for debugging
+        
+        try:
+            result = json.loads(raw_content)
+        except json.JSONDecodeError as je:
+            print(f"[DEBUG] JSON Decode Error: {str(je)}")
+            # Attempt to extract JSON from markdown code blocks if present
+            if "```json" in raw_content:
+                content = raw_content.split("```json")[1].split("```")[0].strip()
+                result = json.loads(content)
+            elif "```" in raw_content:
+                content = raw_content.split("```")[1].split("```")[0].strip()
+                result = json.loads(content)
+            else:
+                raise je
+
+        return result.get("recipes", []), result.get("shopping_list", [])
+    except Exception as e:
+        print(f"[DEBUG] ERNIE Regeneration Error: {str(e)}")
         raise e

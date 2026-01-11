@@ -1,56 +1,62 @@
 [
   {
     "id": "1",
-    "name": "豆腐",
+    "name": "橄榄油",
     "checked": false,
-    "category": "豆制品"
+    "category": "调味品"
   },
   {
     "id": "2",
-    "name": "豆浆",
-    "checked": true,
-    "category": "豆制品"
+    "name": "黑胡椒",
+    "checked": false,
+    "category": "调味品"
   },
   {
     "id": "3",
-    "name": "西红柿",
-    "checked": true,
-    "category": "蔬菜"
+    "name": "盐",
+    "checked": false,
+    "category": "调味品"
   },
   {
     "id": "4",
-    "name": "黄瓜",
+    "name": "生抽",
     "checked": false,
-    "category": "蔬菜"
+    "category": "调味品"
   },
   {
     "id": "5",
-    "name": "葱",
-    "checked": true,
-    "category": "蔬菜"
+    "name": "料酒",
+    "checked": false,
+    "category": "调味品"
   },
   {
     "id": "6",
-    "name": "蒜",
+    "name": "食用油",
     "checked": false,
-    "category": "蔬菜"
+    "category": "调味品"
   },
   {
     "id": "7",
-    "name": "鸡蛋",
+    "name": "寿司海苔",
     "checked": false,
-    "category": "蛋类"
+    "category": "食材"
   },
   {
     "id": "8",
-    "name": "牛奶",
+    "name": "寿司醋",
     "checked": false,
-    "category": "奶制品"
+    "category": "调味品"
   },
   {
     "id": "9",
-    "name": "猪肉",
+    "name": "米饭",
     "checked": false,
-    "category": "肉类"
+    "category": "主食"
+  },
+  {
+    "id": "10",
+    "name": "醋",
+    "checked": false,
+    "category": "调味品"
   }
 ]
