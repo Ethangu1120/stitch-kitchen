@@ -19,6 +19,7 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
 RECIPES_FILE = os.path.join(DATA_DIR, "recipes.json")
 INGREDIENTS_FILE = os.path.join(DATA_DIR, "ingredients.json")
+SHOPPING_FILE = os.path.join(DATA_DIR, "shopping.json")
 AVATAR_DIR = os.path.join(BASE_DIR, "avatars")
 API_BASE = "/api"
 
@@ -283,3 +284,36 @@ def generate_recipe(authorization: Optional[str] = Header(None)):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(f"{API_BASE}/shopping")
+def get_shopping_items(authorization: Optional[str] = Header(None)):
+    # 允许不带 token 获取模拟数据，或者根据业务需求 require_token
+    if not os.path.exists(SHOPPING_FILE):
+        return []
+    with open(SHOPPING_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@app.post(f"{API_BASE}/shopping/toggle/{{item_id}}")
+def toggle_shopping_item(item_id: str, authorization: Optional[str] = Header(None)):
+    if not os.path.exists(SHOPPING_FILE):
+        raise HTTPException(status_code=404, detail="Shopping list not found")
+    
+    with open(SHOPPING_FILE, "r", encoding="utf-8") as f:
+        items = json.load(f)
+    
+    found = False
+    for item in items:
+        if item["id"] == item_id:
+            item["checked"] = not item.get("checked", False)
+            found = True
+            break
+    
+    if not found:
+        raise HTTPException(status_code=404, detail="Item not found")
+        
+    with open(SHOPPING_FILE, "w", encoding="utf-8") as f:
+        json.dump(items, f, ensure_ascii=False, indent=2)
+    
+    return {"message": "Item toggled successfully"}

@@ -1,18 +1,49 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Plus, Check, ChevronDown } from 'lucide-react';
 import { Page, PageHeader } from './components.js';
-import { SHOPPING_ITEMS } from './data.js';
 
 const h = React.createElement;
 
 const ShoppingListScreen = () => {
-  const [items, setItems] = useState(SHOPPING_ITEMS);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const toggleItem = (id) => {
+  useEffect(() => {
+    const fetchShoppingItems = async () => {
+      try {
+        const response = await fetch('http://localhost:8001/api/shopping');
+        const data = await response.json();
+        setItems(data);
+      } catch (err) {
+        console.error('Failed to fetch shopping items:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchShoppingItems();
+  }, []);
+
+  const toggleItem = async (id) => {
+    // Optimistic update
     setItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item))
     );
+
+    try {
+      const response = await fetch(`http://localhost:8001/api/shopping/toggle/${id}`, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to toggle item');
+      }
+    } catch (err) {
+      console.error('Failed to toggle item:', err);
+      // Revert if failed
+      setItems((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item))
+      );
+    }
   };
 
   const groupedItems = useMemo(() => {
@@ -34,9 +65,16 @@ const ShoppingListScreen = () => {
         h(Plus, { size: 24 })
       )
     }),
-    h(
-      'div',
-      { className: 'px-4 space-y-4 pb-20' },
+    loading
+      ? h(
+          'div',
+          { className: 'flex flex-col items-center justify-center flex-1 gap-4 text-center px-6' },
+          h('div', { className: 'w-8 h-8 border-4 border-app-accent border-t-transparent rounded-full animate-spin' }),
+          h('p', { className: 'text-white text-lg font-semibold' }, '正在加载...')
+        )
+      : h(
+          'div',
+          { className: 'px-4 space-y-4 pb-20' },
       Object.entries(groupedItems).map(([category, catItems]) =>
         h(
           'div',

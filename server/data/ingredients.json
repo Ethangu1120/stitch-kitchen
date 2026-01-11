@@ -1,87 +1,67 @@
 [
   {
-    "name": "西红柿",
-    "amount": 1000,
+    "name": "生菜",
+    "amount": 150,
     "category": "蔬菜"
   },
   {
-    "name": "鸡蛋",
-    "amount": 500,
-    "category": "配菜"
+    "name": "樱桃番茄",
+    "amount": 50,
+    "category": "蔬菜"
   },
   {
-    "name": "五花肉",
-    "amount": 800,
-    "category": "肉类"
+    "name": "黄甜椒",
+    "amount": 30,
+    "category": "蔬菜"
   },
   {
-    "name": "青椒",
+    "name": "蘑菇",
     "amount": 300,
     "category": "蔬菜"
   },
   {
-    "name": "鸡胸肉",
-    "amount": 950,
-    "category": "肉类"
-  },
-  {
-    "name": "小葱",
-    "amount": 50,
-    "category": "配菜"
-  },
-  {
-    "name": "生姜",
-    "amount": 30,
-    "category": "配菜"
-  },
-  {
-    "name": "大蒜",
-    "amount": 40,
-    "category": "配菜"
-  },
-  {
-    "name": "生菜",
-    "amount": 400,
-    "category": "蔬菜"
-  },
-  {
-    "name": "小番茄",
-    "amount": 350,
-    "category": "蔬菜"
-  },
-  {
-    "name": "黄彩椒丝",
-    "amount": 30,
-    "category": "蔬菜"
-  },
-  {
-    "name": "口蘑",
-    "amount": 400,
+    "name": "樱桃番茄",
+    "amount": 150,
     "category": "蔬菜"
   },
   {
     "name": "红甜椒",
-    "amount": 600,
+    "amount": 200,
     "category": "蔬菜"
   },
   {
     "name": "西兰花",
-    "amount": 350,
+    "amount": 200,
     "category": "蔬菜"
   },
   {
     "name": "三文鱼",
-    "amount": 350,
+    "amount": 250,
     "category": "海鲜/河鲜"
   },
   {
-    "name": "洋葱",
-    "amount": 600,
+    "name": "鸡胸肉",
+    "amount": 250,
+    "category": "肉类"
+  },
+  {
+    "name": "红甜椒",
+    "amount": 200,
     "category": "蔬菜"
   },
   {
-    "name": "黄色彩椒",
-    "amount": 30,
+    "name": "樱桃番茄",
+    "amount": 100,
+    "category": "蔬菜"
+  },
+  {
+    "name": "生菜",
+    "amount": 150,
+    "category": "蔬菜"
+  },
+  {
+    "name": "洋葱",
+    "amount": 300,
     "category": "蔬菜"
   }
 ]
