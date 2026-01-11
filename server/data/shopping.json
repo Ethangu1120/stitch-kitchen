@@ -1,11 +1,56 @@
 [
-  { "id": "1", "name": "豆腐", "checked": false, "category": "豆制品" },
-  { "id": "2", "name": "豆浆", "checked": true, "category": "豆制品" },
-  { "id": "3", "name": "西红柿", "checked": false, "category": "蔬菜" },
-  { "id": "4", "name": "黄瓜", "checked": false, "category": "蔬菜" },
-  { "id": "5", "name": "葱", "checked": true, "category": "蔬菜" },
-  { "id": "6", "name": "蒜", "checked": false, "category": "蔬菜" },
-  { "id": "7", "name": "鸡蛋", "checked": false, "category": "蛋类" },
-  { "id": "8", "name": "牛奶", "checked": false, "category": "奶制品" },
-  { "id": "9", "name": "猪肉", "checked": false, "category": "肉类" }
+  {
+    "id": "1",
+    "name": "豆腐",
+    "checked": false,
+    "category": "豆制品"
+  },
+  {
+    "id": "2",
+    "name": "豆浆",
+    "checked": true,
+    "category": "豆制品"
+  },
+  {
+    "id": "3",
+    "name": "西红柿",
+    "checked": true,
+    "category": "蔬菜"
+  },
+  {
+    "id": "4",
+    "name": "黄瓜",
+    "checked": false,
+    "category": "蔬菜"
+  },
+  {
+    "id": "5",
+    "name": "葱",
+    "checked": true,
+    "category": "蔬菜"
+  },
+  {
+    "id": "6",
+    "name": "蒜",
+    "checked": false,
+    "category": "蔬菜"
+  },
+  {
+    "id": "7",
+    "name": "鸡蛋",
+    "checked": false,
+    "category": "蛋类"
+  },
+  {
+    "id": "8",
+    "name": "牛奶",
+    "checked": false,
+    "category": "奶制品"
+  },
+  {
+    "id": "9",
+    "name": "猪肉",
+    "checked": false,
+    "category": "肉类"
+  }
 ]
