@@ -235,6 +235,26 @@ async def identify_fridge_ingredients(
         raise HTTPException(status_code=500, detail=f"识别失败: {str(e)}")
 
 
+@app.get(f"{API_BASE}/recipes")
+def get_recipes():
+    if not os.path.exists(RECIPES_FILE):
+        return []
+    with open(RECIPES_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@app.get(f"{API_BASE}/recipes/{{name}}")
+def get_recipe(name: str):
+    if not os.path.exists(RECIPES_FILE):
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    with open(RECIPES_FILE, "r", encoding="utf-8") as f:
+        recipes = json.load(f)
+    for r in recipes:
+        if r["name"] == name:
+            return r
+    raise HTTPException(status_code=404, detail="Recipe not found")
+
+
 @app.post(f"{API_BASE}/recipes/generate")
 def generate_recipe(authorization: Optional[str] = Header(None)):
     username = require_token(authorization)

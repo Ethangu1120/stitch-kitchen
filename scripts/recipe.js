@@ -1,19 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { ArrowLeft, Star, Check } from 'lucide-react';
+import { ArrowLeft, Star, Check, Utensils } from 'lucide-react';
 import { Page } from './components.js';
-import { RECIPES } from './data.js';
 
 const h = React.createElement;
 
-const getRecipeFromQuery = () => {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
-  return RECIPES.find((recipe) => recipe.id === id);
-};
-
 const RecipeDetail = () => {
-  const recipe = getRecipeFromQuery();
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get('name'); // Changed from 'id' to 'name' to match home.js
+
+      if (!name) {
+        setError('未提供菜谱名称');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8001/api/recipes/${encodeURIComponent(name)}`);
+        if (!response.ok) {
+          throw new Error('菜谱未找到');
+        }
+        const data = await response.json();
+        setRecipe(data);
+      } catch (err) {
+        console.error('Failed to fetch recipe:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipe();
+  }, []);
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -23,18 +47,33 @@ const RecipeDetail = () => {
     }
   };
 
-  if (!recipe) {
+  if (loading) {
     return h(
       Page,
       { current: 'home' },
       h(
         'div',
         { className: 'flex flex-col items-center justify-center flex-1 gap-4 text-center px-6' },
-        h('p', { className: 'text-white text-lg font-semibold' }, '未找到该菜谱'),
+        h('div', { className: 'w-8 h-8 border-4 border-app-accent border-t-transparent rounded-full animate-spin' }),
+        h('p', { className: 'text-white text-lg font-semibold' }, '正在加载...')
+      )
+    );
+  }
+
+  if (error || !recipe) {
+    return h(
+      Page,
+      { current: 'home' },
+      h(
+        'div',
+        { className: 'flex flex-col items-center justify-center flex-1 gap-4 text-center px-6' },
+        h('p', { className: 'text-white text-lg font-semibold' }, error || '未找到该菜谱'),
         h('a', { className: 'text-app-accent underline', href: './index.html' }, '返回推荐列表')
       )
     );
   }
+
+  const totalTime = (recipe.time?.prep || 0) + (recipe.time?.cook || 0);
 
   return h(
     Page,
@@ -53,26 +92,35 @@ const RecipeDetail = () => {
         h(
           'h2',
           { className: 'text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center' },
-          '菜谱'
+          '菜谱详情'
         ),
         h('div', { className: 'text-white flex size-12 shrink-0 items-center justify-end -mr-3' }, h(Star, { size: 24 }))
       ),
-      h('div', {
-        className:
-          'w-full aspect-[4/3] sm:aspect-video bg-center bg-no-repeat bg-cover flex flex-col justify-end overflow-hidden bg-app-bg sm:rounded-lg sm:mx-4 sm:w-auto',
-        style: { backgroundImage: `url("${recipe.image}")` }
-      }),
+      h(
+        'div',
+        {
+          className: 'w-full aspect-[4/3] sm:aspect-video bg-center bg-no-repeat bg-cover flex flex-col justify-end overflow-hidden bg-app-card sm:rounded-lg sm:mx-4 sm:w-auto relative'
+        },
+        recipe.image
+          ? h('div', {
+              className: 'absolute inset-0 bg-center bg-no-repeat bg-cover',
+              style: { backgroundImage: `url("${recipe.image}")` }
+            })
+          : h(
+              'div',
+              { className: 'absolute inset-0 flex items-center justify-center bg-app-card' },
+              h(Utensils, { size: 48, className: 'text-app-textSub' })
+            )
+      ),
       h(
         'h1',
         { className: 'text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 text-left pb-3 pt-5' },
-        recipe.title
+        recipe.name
       ),
       h(
         'p',
         { className: 'text-white text-base font-normal leading-normal pb-3 pt-1 px-4' },
-        `一道简单又美味的${recipe.title}，适合快速${
-          recipe.category === 'Breakfast' ? '早餐' : recipe.category === 'Lunch' ? '午餐' : '晚餐'
-        }。`
+        recipe.description || `一道简单又美味的${recipe.name}。`
       ),
       h(
         'div',
@@ -81,19 +129,19 @@ const RecipeDetail = () => {
           'div',
           { className: 'flex justify-between gap-x-6 py-2' },
           h('p', { className: 'text-app-textSub text-sm font-normal leading-normal' }, '准备时间'),
-          h('p', { className: 'text-white text-sm font-normal leading-normal text-right' }, recipe.prepTime)
+          h('p', { className: 'text-white text-sm font-normal leading-normal text-right' }, `${recipe.time?.prep || 0} 分钟`)
         ),
         h(
           'div',
           { className: 'flex justify-between gap-x-6 py-2' },
           h('p', { className: 'text-app-textSub text-sm font-normal leading-normal' }, '烹饪时间'),
-          h('p', { className: 'text-white text-sm font-normal leading-normal text-right' }, recipe.cookTime)
+          h('p', { className: 'text-white text-sm font-normal leading-normal text-right' }, `${recipe.time?.cook || 0} 分钟`)
         ),
         h(
           'div',
           { className: 'flex justify-between gap-x-6 py-2' },
           h('p', { className: 'text-app-textSub text-sm font-normal leading-normal' }, '总时间'),
-          h('p', { className: 'text-white text-sm font-normal leading-normal text-right' }, recipe.totalTime)
+          h('p', { className: 'text-white text-sm font-normal leading-normal text-right' }, `${totalTime} 分钟`)
         )
       ),
       h(
@@ -116,7 +164,7 @@ const RecipeDetail = () => {
               { className: 'relative flex items-center' },
               h('input', {
                 type: 'checkbox',
-                defaultChecked: idx < 2,
+                defaultChecked: ing.isEnough,
                 className:
                   'peer h-5 w-5 appearance-none rounded border-2 border-[#326744] bg-transparent checked:border-app-accent checked:bg-app-accent focus:ring-0 focus:ring-offset-0 transition-all'
               }),
@@ -126,7 +174,11 @@ const RecipeDetail = () => {
                 strokeWidth: 4
               })
             ),
-            h('p', { className: 'text-white text-base font-normal leading-normal select-none' }, `${ing.name} ${ing.amount || ''}`)
+            h(
+              'p',
+              { className: 'text-white text-base font-normal leading-normal select-none' },
+              `${ing.name} ${ing.amount ? ing.amount + 'g' : ''}`
+            )
           )
         )
       ),
@@ -138,16 +190,12 @@ const RecipeDetail = () => {
       h(
         'div',
         { className: 'space-y-1' },
-        recipe.steps.map((step) =>
+        recipe.steps.map((step, idx) =>
           h(
             'div',
-            { key: step.id, className: 'flex items-center gap-4 bg-app-bg px-4 min-h-[72px] py-2' },
-            h(
-              'div',
-              { className: 'flex flex-col justify-center' },
-              h('p', { className: 'text-white text-base font-medium leading-normal line-clamp-1' }, `步骤 ${step.id}`),
-              h('p', { className: 'text-app-textSub text-sm font-normal leading-normal' }, step.instruction)
-            )
+            { key: idx, className: 'flex flex-col gap-1 bg-app-bg px-4 min-h-[72px] py-3' },
+            h('p', { className: 'text-white text-base font-medium leading-normal' }, `步骤 ${idx + 1}`),
+            h('p', { className: 'text-app-textSub text-sm font-normal leading-normal' }, step)
           )
         )
       )

@@ -22,5 +22,121 @@
       "加入一勺白糖和适量盐调味。",
       "倒入之前炒好的鸡蛋，快速翻炒均匀即可出锅。"
     ]
+  },
+  {
+    "name": "青椒炒肉丝",
+    "description": "香辣爽口，肉丝滑嫩，非常下饭的一道家常菜。",
+    "type": "晚饭",
+    "time": {
+      "prep": 10,
+      "cook": 8
+    },
+    "ingredients": [
+      { "name": "猪里脊肉", "amount": 200, "isEnough": true },
+      { "name": "青椒", "amount": 150, "isEnough": true },
+      { "name": "生抽", "amount": 15, "isEnough": true },
+      { "name": "料酒", "amount": 10, "isEnough": true },
+      { "name": "淀粉", "amount": 5, "isEnough": true },
+      { "name": "大蒜", "amount": 10, "isEnough": true }
+    ],
+    "steps": [
+      "猪里脊肉切丝，加入生抽、料酒、淀粉抓匀腌制10分钟。",
+      "青椒去籽切丝，大蒜切片备用。",
+      "锅中倒油，烧热后放入肉丝快速滑散，炒至变色盛出。",
+      "锅中留少许油，放入蒜片爆香，下青椒丝翻炒至断生。",
+      "倒入肉丝，加入适量盐 and 生抽调味，翻炒均匀即可。"
+    ]
+  },
+  {
+    "name": "香煎三文鱼",
+    "description": "高蛋白低脂肪，外焦里嫩，充满柠檬清香。",
+    "type": "晚饭",
+    "time": {
+      "prep": 5,
+      "cook": 12
+    },
+    "ingredients": [
+      { "name": "三文鱼", "amount": 200, "isEnough": true },
+      { "name": "柠檬", "amount": 30, "isEnough": true },
+      { "name": "黑胡椒", "amount": 2, "isEnough": true },
+      { "name": "海盐", "amount": 2, "isEnough": true },
+      { "name": "黄油", "amount": 10, "isEnough": true }
+    ],
+    "steps": [
+      "三文鱼用厨房纸吸干水分，撒上黑胡椒 and 海盐，挤入少许柠檬汁腌制5分钟。",
+      "平底锅放入黄油，中小火融化。",
+      "放入三文鱼块，皮朝下煎约3-4分钟至表皮金黄焦脆。",
+      "翻面继续煎约2分钟，侧面也稍微煎一下。",
+      "出锅后摆盘，配上新鲜柠檬片即可。"
+    ]
+  },
+  {
+    "name": "燕麦水果碗",
+    "description": "快手早餐，营养均衡，开启活力满满的一天。",
+    "type": "早餐",
+    "time": {
+      "prep": 5,
+      "cook": 0
+    },
+    "ingredients": [
+      { "name": "燕麦片", "amount": 50, "isEnough": true },
+      { "name": "牛奶", "amount": 200, "isEnough": true },
+      { "name": "蓝莓", "amount": 30, "isEnough": true },
+      { "name": "香蕉", "amount": 1, "isEnough": true },
+      { "name": "坚果", "amount": 20, "isEnough": true }
+    ],
+    "steps": [
+      "将燕麦片放入碗中，倒入牛奶浸泡或微波炉加热2分钟。",
+      "香蕉切片，蓝莓洗净。",
+      "在燕麦粥表面摆放好香蕉片、蓝莓和坚果即可。"
+    ]
+  },
+  {
+    "name": "地三鲜",
+    "description": "经典的东北名菜，土豆、茄子、青椒的完美结合。",
+    "type": "中饭",
+    "time": {
+      "prep": 15,
+      "cook": 15
+    },
+    "ingredients": [
+      { "name": "土豆", "amount": 200, "isEnough": true },
+      { "name": "茄子", "amount": 200, "isEnough": true },
+      { "name": "青椒", "amount": 100, "isEnough": true },
+      { "name": "生抽", "amount": 20, "isEnough": true },
+      { "name": "老抽", "amount": 5, "isEnough": true },
+      { "name": "淀粉", "amount": 10, "isEnough": true }
+    ],
+    "steps": [
+      "土豆、茄子切成滚刀块，青椒切片。",
+      "锅中热油，分别将土豆块和茄子块炸至表面金黄捞出备用。",
+      "调酱汁：生抽、老抽、糖、淀粉、水混合均匀。",
+      "留底油，下葱姜蒜爆香，放入土豆、茄子、青椒翻炒。",
+      "倒入酱汁，大火收汁至浓稠即可。"
+    ]
+  },
+  {
+    "name": "红烧肉",
+    "description": "肥而不腻，瘦而不柴，色泽红亮，入口即化。",
+    "type": "晚饭",
+    "time": {
+      "prep": 20,
+      "cook": 60
+    },
+    "ingredients": [
+      { "name": "五花肉", "amount": 500, "isEnough": true },
+      { "name": "冰糖", "amount": 30, "isEnough": true },
+      { "name": "生抽", "amount": 30, "isEnough": true },
+      { "name": "老抽", "amount": 15, "isEnough": true },
+      { "name": "八角", "amount": 2, "isEnough": true },
+      { "name": "桂皮", "amount": 1, "isEnough": true }
+    ],
+    "steps": [
+      "五花肉切块，冷水下锅，加料酒焯水去腥，捞出洗净沥干。",
+      "锅中加少许油，下五花肉中小火煸炒至出油，表面微黄捞出。",
+      "留少许油放入冰糖，小火炒出糖色，倒入肉块快速翻炒上色。",
+      "加入生抽、老抽、八角、桂皮和足量热水，大火烧开转小火炖45-60分钟。",
+      "最后大火收汁至浓稠即可。"
+    ]
   }
 ]
