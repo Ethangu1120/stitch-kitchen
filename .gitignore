@@ -12,23 +12,54 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
 # Environment files
 .env
 .env.*
-.venv/*
+server/.env
+.venv/
+venv/
+ENV/
+env/
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+.coverage
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.pyo
+*.pyd
+
+# Node/Web
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDEs
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Project specific
+server/avatars/*
+!server/avatars/.gitkeep

@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from fastapi.responses import Response
 from dotenv import load_dotenv
 
-from ai_utils import generate_recipe_with_ai, identify_ingredients_from_image, update_data_with_ai, regenerate_all_data_with_ai
+from .ai_utils import generate_recipe_with_ai, identify_ingredients_from_image, update_data_with_ai, regenerate_all_data_with_ai
 
 load_dotenv()
 
@@ -38,7 +38,15 @@ app = FastAPI(title="Stitch Kitchen API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8000"],
+    allow_origins=[
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "null"  # allow file:// origins
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
